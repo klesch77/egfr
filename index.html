@@ -411,11 +411,6 @@
             const day = String(today.getDate()).padStart(2, '0');
             calculationDateInput.value = `${year}-${month}-${day}`;
             
-            // Set default settings
-            dobInput.value = '1977-01-01';
-            sexSelect.value = 'male';
-            raceSelect.value = 'non-black';
-
             // Conversion factor
             const CONVERSION_FACTOR = 88.4;
 
@@ -447,44 +442,6 @@
                 return 142 * Math.pow(creatinine_mgdl / k, alpha) * Math.pow(0.9938, age) * raceFactor;
             }
 
-            // Pre-populate history for demonstration
-            function prefillHistory() {
-                const dob = '1977-01-01';
-                const sex = 'male';
-                const race = 'non-black';
-                const startYear = 2000;
-                const endYear = 2022;
-                // Adjusted creatinine values to show a more gradual, realistic decline
-                const startCreatinine = 98; // µmol/L (healthy)
-                const endCreatinine = 150; // µmol/L (stage 3a)
-                const totalYears = endYear - startYear;
-                
-                history = [];
-
-                for (let y = startYear; y <= endYear; y++) {
-                    const date = `${y}-01-01`;
-                    const progress = (y - startYear) / totalYears;
-                    let creatinine = startCreatinine + (endCreatinine - startCreatinine) * progress;
-                    
-                    // Add random deviation of +/- 5%
-                    const deviation = (Math.random() * 0.1) - 0.05; // range from -0.05 to +0.05
-                    creatinine += creatinine * deviation;
-
-                    const creatinine_mgdl = creatinine / CONVERSION_FACTOR;
-                    const age = calculateAge(dob, date);
-                    const egfr = calculateEGFRFromCreatinine(creatinine_mgdl, age, sex, race);
-
-                    history.push({ 
-                        date: date, 
-                        egfr: egfr,
-                        age: age.toFixed(0),
-                        creatinine: creatinine.toFixed(2),
-                        units: 'µmol/L'
-                    });
-                }
-            }
-
-            prefillHistory(); // Populate the history array before chart and UI are initialized
 
             const egfrChart = new Chart(document.getElementById('egfrChart'), {
                 type: 'line',
@@ -977,7 +934,7 @@
             settingsTabBtn.addEventListener('click', () => showTab('settings'));
             historyTabBtn.addEventListener('click', () => showTab('history'));
 
-            // Initial chart render with pre-filled data
+            // Initial chart render with empty data
             updateChart();
         });
     </script>
