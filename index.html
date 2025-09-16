@@ -712,6 +712,7 @@
             // Function to delete an entry from history and update UI
             function deleteHistoryEntry(index) {
                 history.splice(index, 1);
+                saveToLocalStorage();
                 updateHistoryTable();
                 updateChart();
                 hideConfirmationModal();
@@ -892,6 +893,9 @@
                     units: currentUnit
                 });
 
+                // Save data to local storage after a new calculation
+                saveToLocalStorage();
+
                 // Update chart and history table
                 updateChart();
                 updateHistoryTable();
@@ -916,11 +920,42 @@
                     }
                 }
             }
+            
+            // Local Storage functions
+            function saveToLocalStorage() {
+                const patientData = {
+                    dob: dobInput.value,
+                    sex: sexSelect.value,
+                    race: raceSelect.value,
+                    history: history
+                };
+                localStorage.setItem('creatinineCalculatorData', JSON.stringify(patientData));
+            }
+            
+            function loadFromLocalStorage() {
+                const storedData = localStorage.getItem('creatinineCalculatorData');
+                if (storedData) {
+                    const patientData = JSON.parse(storedData);
+                    dobInput.value = patientData.dob || '';
+                    sexSelect.value = patientData.sex || 'female';
+                    raceSelect.value = patientData.race || 'non-black';
+                    history = patientData.history || [];
+                    
+                    updateHistoryTable();
+                    updateChart();
+                }
+            }
+
+            // Event listeners for patient settings to save changes
+            dobInput.addEventListener('change', saveToLocalStorage);
+            sexSelect.addEventListener('change', saveToLocalStorage);
+            raceSelect.addEventListener('change', saveToLocalStorage);
 
             // Initial setup - default language is Russian, default unit is µmol/L
             updateLanguage('ru');
             handleUnitSwitch();
             showTab('calculator');
+            loadFromLocalStorage();
 
             calculateBtn.addEventListener('click', calculateEGFR);
             unitSwitch.addEventListener('change', handleUnitSwitch);
@@ -933,9 +968,6 @@
             calculatorTabBtn.addEventListener('click', () => showTab('calculator'));
             settingsTabBtn.addEventListener('click', () => showTab('settings'));
             historyTabBtn.addEventListener('click', () => showTab('history'));
-
-            // Initial chart render with empty data
-            updateChart();
         });
     </script>
 </body>
