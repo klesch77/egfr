@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creatinine Calculator</title>
+    <title>Калькулятор СКФ по формуле CKD-EPI</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-    <!-- Add the Chart.js Annotation Plugin for the CKD stage markers -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.0.0/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -83,12 +81,15 @@
             background-color: transparent;
             border: none;
             cursor: pointer;
+            color: #dc2626;
+            font-weight: 600;
+            font-size: 1.5rem;
+            line-height: 1;
+            padding: 0;
+            transition: color 0.2s;
         }
-        .delete-btn svg {
-            transition: transform 0.2s;
-        }
-        .delete-btn:hover svg {
-            transform: scale(1.1);
+        .delete-btn:hover {
+            color: #b91c1c;
         }
         .modal-overlay {
             position: fixed;
@@ -118,96 +119,74 @@
         
         <!-- Main Content Section -->
         <div class="flex-1">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center lg:text-left" data-lang-key="h1Title">CKD-EPI eGFR Calculator</h1>
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center lg:text-left" data-lang-key="h1Title">Калькулятор СКФ по формуле CKD-EPI</h1>
 
             <!-- Language Switch -->
             <div class="flex items-center justify-end mb-6">
-                <span class="mr-2 text-sm text-gray-600 font-medium" data-lang-key="langEn">EN</span>
+                <span class="mr-2 text-sm text-gray-600 font-medium" data-lang-key="langEn">АНГЛ</span>
                 <label class="switch">
                     <input type="checkbox" id="langSwitch" checked>
                     <span class="slider"></span>
                 </label>
-                <span class="ml-2 text-sm text-gray-600 font-medium" data-lang-key="langRu">RU</span>
+                <span class="ml-2 text-sm text-gray-600 font-medium" data-lang-key="langRu">РУС</span>
             </div>
             
             <!-- Tab Buttons -->
             <div class="flex border-b border-gray-200 mb-6">
-                <button id="calculatorTabBtn" class="py-2 px-4 text-sm font-medium focus:outline-none transition-colors duration-200" data-lang-key="calculatorTab">Calculator</button>
-                <button id="settingsTabBtn" class="py-2 px-4 text-sm font-medium focus:outline-none transition-colors duration-200" data-lang-key="settingsTab">Settings</button>
-                <button id="historyTabBtn" class="py-2 px-4 text-sm font-medium focus:outline-none transition-colors duration-200" data-lang-key="historyTab">History</button>
+                <button id="calculatorTabBtn" class="py-2 px-4 text-sm font-medium focus:outline-none transition-colors duration-200" data-lang-key="calculatorTab">Калькулятор</button>
+                <button id="historyTabBtn" class="py-2 px-4 text-sm font-medium focus:outline-none transition-colors duration-200" data-lang-key="historyTab">История</button>
+                <button id="settingsTabBtn" class="py-2 px-4 text-sm font-medium focus:outline-none transition-colors duration-200" data-lang-key="settingsTab">Настройки</button>
             </div>
             
             <!-- Tab Content -->
             <div id="calculatorContent" class="space-y-6">
                 <!-- Calculator Tab -->
                 <div class="form-group">
-                    <label for="calculationDate" class="block text-sm" data-lang-key="dateLabel">Date of Calculation</label>
+                    <label for="calculationDate" class="block text-sm" data-lang-key="dateLabel">Дата расчета</label>
                     <input type="date" id="calculationDate" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
                 </div>
 
                 <div class="form-group flex items-center justify-between">
                     <div class="flex-1">
-                        <label for="creatinine" id="creatinineLabel" class="block text-sm" data-lang-key="creatinineLabel_mgdl">Serum Creatinine (mg/dL)</label>
-                        <input type="number" id="creatinine" step="0.01" placeholder="e.g., 1.2" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                        <label for="creatinine" id="creatinineLabel" class="block text-sm" data-lang-key="creatinineLabel_mgdl">Креатинин сыворотки (мг/дл)</label>
+                        <input type="number" id="creatinine" step="0.01" placeholder="например, 1.2" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
                     </div>
                     
                     <div class="flex items-center ml-4">
-                        <span class="mr-2 text-sm text-gray-600 font-medium">mg/dL</span>
+                        <span class="mr-2 text-sm text-gray-600 font-medium">мг/дл</span>
                         <label class="switch">
                             <input type="checkbox" id="unitSwitch" checked>
                             <span class="slider"></span>
                         </label>
-                        <span class="ml-2 text-sm text-gray-600 font-medium">µmol/L</span>
+                        <span class="ml-2 text-sm text-gray-600 font-medium">мкмоль/л</span>
                     </div>
                 </div>
 
                 <div>
-                    <button id="calculateBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-lg shadow-md hover:bg-blue-700 transition-colors duration-200" data-lang-key="calculateBtn">Calculate eGFR</button>
+                    <button id="calculateBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-lg shadow-md hover:bg-blue-700 transition-colors duration-200" data-lang-key="calculateBtn">Рассчитать СКФ</button>
                 </div>
 
                 <div id="results" class="bg-gray-50 p-6 rounded-lg shadow-inner text-center hidden">
-                    <p class="text-sm font-medium text-gray-500" data-lang-key="egfrLabel">Estimated GFR</p>
+                    <p class="text-sm font-medium text-gray-500" data-lang-key="egfrLabel">Расчетная СКФ</p>
                     <p id="egfrValue" class="text-5xl font-extrabold text-blue-600 mt-1">--</p>
-                    <p class="text-sm font-medium text-gray-500" data-lang-key="egfrUnits">mL/min/1.73 $m^2$</p>
+                    <p class="text-sm font-medium text-gray-500" data-lang-key="egfrUnits">мл/мин/1.73 $м^2$</p>
                 </div>
 
                 <div id="message-box" class="mt-4 p-4 rounded-lg text-sm text-center font-medium hidden"></div>
             </div>
 
-            <div id="settingsContent" class="space-y-6 hidden">
-                <!-- Settings Tab -->
-                <div class="form-group">
-                    <label for="dob" class="block text-sm" data-lang-key="dobLabel">Date of Birth</label>
-                    <input type="date" id="dob" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
-                </div>
-                
-                <div class="form-group">
-                    <label for="sex" class="block text-sm" data-lang-key="sexLabel">Sex</label>
-                    <select id="sex" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
-                        <option value="female" data-lang-key="femaleOption">Female</option>
-                        <option value="male" data-lang-key="maleOption">Male</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="race" class="block text-sm" data-lang-key="raceLabel">Race</label>
-                    <select id="race" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
-                        <option value="non-black" data-lang-key="nonBlackOption">Non-Black</option>
-                        <option value="black" data-lang-key="blackOption">Black</option>
-                    </select>
-                </div>
-            </div>
-
             <div id="historyContent" class="space-y-6 hidden">
                 <!-- History Tab -->
-                <h2 class="text-xl font-bold text-gray-800" data-lang-key="historyTitle">Calculation History</h2>
+                <h2 class="text-xl font-bold text-gray-800" data-lang-key="historyTitle">История расчетов</h2>
+                <div id="import-message-box" class="mt-4 p-4 rounded-lg text-sm text-center font-medium hidden bg-green-100 text-green-700"></div>
                 <div class="overflow-x-auto rounded-lg shadow-inner">
                     <table id="historyTable" class="min-w-full bg-white">
                         <thead>
                             <tr>
-                                <th class="py-3 px-6 text-sm font-medium text-gray-500 uppercase tracking-wider" data-lang-key="historyDateHeader">Date</th>
-                                <th class="py-3 px-6 text-sm font-medium text-gray-500 uppercase tracking-wider" data-lang-key="historyEgfrHeader">eGFR (mL/min/1.73 $m^2$)</th>
-                                <th class="py-3 px-6"></th> <!-- New column for delete button -->
+                                <th class="py-3 px-6 text-sm font-medium text-gray-500 uppercase tracking-wider" data-lang-key="historyDateHeader">Дата</th>
+                                <th class="py-3 px-6 text-sm font-medium text-gray-500 uppercase tracking-wider" data-lang-key="historyEgfrHeader">СКФ</th>
+                                <th class="py-3 px-6 text-sm font-medium text-gray-500 uppercase tracking-wider" data-lang-key="creatinineLabel_umoll">Креатинин</th>
+                                <th class="py-3 px-6"></th>
                             </tr>
                         </thead>
                         <tbody id="historyTableBody">
@@ -215,43 +194,76 @@
                         </tbody>
                     </table>
                 </div>
+                
+                <div class="flex space-x-4 mt-6">
+                    <button id="exportBtn" class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors duration-200" data-lang-key="exportBtn">Экспорт данных</button>
+                    <label class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg font-semibold cursor-pointer hover:bg-gray-300 transition-colors duration-200 flex items-center justify-center">
+                        <span data-lang-key="importBtn">Импорт данных</span>
+                        <input type="file" id="importFile" accept=".json" class="hidden">
+                    </label>
+                </div>
+            </div>
+
+            <div id="settingsContent" class="space-y-6 hidden">
+                <!-- Settings Tab -->
+                <div class="form-group">
+                    <label for="dob" class="block text-sm" data-lang-key="dobLabel">Дата рождения</label>
+                    <input type="date" id="dob" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                </div>
+                
+                <div class="form-group">
+                    <label for="sex" class="block text-sm" data-lang-key="sexLabel">Пол</label>
+                    <select id="sex" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                        <option value="female" data-lang-key="femaleOption">Женский</option>
+                        <option value="male" data-lang-key="maleOption">Мужской</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="race" class="block text-sm" data-lang-key="raceLabel">Раса</label>
+                    <select id="race" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                        <option value="non-black" data-lang-key="nonBlackOption">Не-черная</option>
+                        <option value="black" data-lang-key="blackOption">Черная</option>
+                    </select>
+                </div>
             </div>
         </div>
 
         <!-- Chart Section -->
-        <div class="flex-1 flex flex-col items-center justify-center">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center" data-lang-key="chartTitle">eGFR History Chart</h2>
-            <div class="w-full">
+        <div id="chartSection" class="flex-1 flex flex-col items-center justify-center">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center" data-lang-key="chartTitle">График истории СКФ</h2>
+            
+            <div id="chartContainer" class="w-full h-[500px]">
                 <canvas id="egfrChart"></canvas>
             </div>
             
             <!-- CKD Stages Legend -->
-            <div class="mt-6 w-full max-w-lg">
-                <h3 class="text-lg font-bold text-gray-800 text-center mb-4" data-lang-key="legendTitle">CKD Stages Legend</h3>
+            <div id="egfrLegend" class="mt-6 w-full max-w-lg">
+                <h3 class="text-lg font-bold text-gray-800 text-center mb-4" data-lang-key="legendTitle">Легенда стадий ХБП</h3>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm font-medium">
                     <div class="flex items-center space-x-2">
                         <div class="w-4 h-4 rounded-full bg-[#10b981]"></div>
-                        <span data-lang-key="ckdStage1">CKD Stage 1 (>=90)</span>
+                        <span data-lang-key="ckdStage1">ХБП стадия 1 (>=90)</span>
                     </div>
                     <div class="flex items-center space-x-2">
                         <div class="w-4 h-4 rounded-full bg-[#22c55e]"></div>
-                        <span data-lang-key="ckdStage2">CKD Stage 2 (60-89)</span>
+                        <span data-lang-key="ckdStage2">ХБП стадия 2 (60-89)</span>
                     </div>
                     <div class="flex items-center space-x-2">
                         <div class="w-4 h-4 rounded-full bg-[#eab308]"></div>
-                        <span data-lang-key="ckdStage3a">CKD Stage 3a (45-59)</span>
+                        <span data-lang-key="ckdStage3a">ХБП стадия 3a (45-59)</span>
                     </div>
                     <div class="flex items-center space-x-2">
                         <div class="w-4 h-4 rounded-full bg-[#f59e0b]"></div>
-                        <span data-lang-key="ckdStage3b">CKD Stage 3b (30-44)</span>
+                        <span data-lang-key="ckdStage3b">ХБП стадия 3b (30-44)</span>
                     </div>
                     <div class="flex items-center space-x-2">
                         <div class="w-4 h-4 rounded-full bg-[#f97316]"></div>
-                        <span data-lang-key="ckdStage4">CKD Stage 4 (15-29)</span>
+                        <span data-lang-key="ckdStage4">ХБП стадия 4 (15-29)</span>
                     </div>
                     <div class="flex items-center space-x-2">
                         <div class="w-4 h-4 rounded-full bg-[#ef4444]"></div>
-                        <span data-lang-key="ckdStage5">CKD Stage 5 (<15)</span>
+                        <span data-lang-key="ckdStage5">ХБП стадия 5 (<15)</span>
                     </div>
                 </div>
             </div>
@@ -264,11 +276,23 @@
     <!-- Confirmation Modal -->
     <div id="confirmationModal" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3 class="text-xl font-bold text-gray-800 mb-4" data-lang-key="confirmTitle">Confirm Deletion</h3>
-            <p class="text-gray-600 mb-6" data-lang-key="confirmMessage">Are you sure you want to delete this calculation from your history?</p>
+            <h3 class="text-xl font-bold text-gray-800 mb-4" data-lang-key="confirmTitle">Подтвердите удаление</h3>
+            <p class="text-gray-600 mb-6" data-lang-key="confirmMessage">Вы уверены, что хотите удалить этот расчет из своей истории?</p>
             <div class="flex justify-center space-x-4">
-                <button id="confirmDeleteBtn" class="bg-red-500 text-white py-2 px-6 rounded-lg font-semibold hover:bg-red-600 transition-colors duration-200" data-lang-key="confirmBtn">Confirm</button>
-                <button id="cancelDeleteBtn" class="bg-gray-300 text-gray-800 py-2 px-6 rounded-lg font-semibold hover:bg-gray-400 transition-colors duration-200" data-lang-key="cancelBtn">Cancel</button>
+                <button id="confirmDeleteBtn" class="bg-red-500 text-white py-2 px-6 rounded-lg font-semibold hover:bg-red-600 transition-colors duration-200" data-lang-key="confirmBtn">Подтвердить</button>
+                <button id="cancelDeleteBtn" class="bg-gray-300 text-gray-800 py-2 px-6 rounded-lg font-semibold hover:bg-gray-400 transition-colors duration-200" data-lang-key="cancelBtn">Отмена</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Import Warning Modal -->
+    <div id="importWarningModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold text-gray-800 mb-4" data-lang-key="importWarningTitle">Предупреждение</h3>
+            <p class="text-gray-600 mb-6" data-lang-key="importWarningMessage">Вы уверены, что хотите импортировать данные? Это действие **полностью очистит** текущую историю и заменит их данными из файла.</p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirmImportBtn" class="bg-red-500 text-white py-2 px-6 rounded-lg font-semibold hover:bg-red-600 transition-colors duration-200" data-lang-key="confirmImportBtn">Подтвердить</button>
+                <button id="cancelImportBtn" class="bg-gray-300 text-gray-800 py-2 px-6 rounded-lg font-semibold hover:bg-gray-400 transition-colors duration-200" data-lang-key="cancelBtn">Отмена</button>
             </div>
         </div>
     </div>
@@ -285,6 +309,7 @@
             const resultsDiv = document.getElementById('results');
             const egfrValueSpan = document.getElementById('egfrValue');
             const messageBox = document.getElementById('message-box');
+            const importMessageBox = document.getElementById('import-message-box');
             const calculationDateInput = document.getElementById('calculationDate');
             const langSwitch = document.getElementById('langSwitch');
             const calculatorTabBtn = document.getElementById('calculatorTabBtn');
@@ -295,23 +320,33 @@
             const historyContent = document.getElementById('historyContent');
             const historyTableBody = document.getElementById('historyTableBody');
             const disclaimerText = document.getElementById('disclaimer');
+            const chartSection = document.getElementById('chartSection');
 
             const confirmationModal = document.getElementById('confirmationModal');
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 
-            // Store the index of the item to be deleted
-            let itemToDeleteIndex = -1;
+            const egfrLegend = document.getElementById('egfrLegend');
+            
+            const ctx = document.getElementById('egfrChart').getContext('2d');
+            
+            const exportBtn = document.getElementById('exportBtn');
+            const importFile = document.getElementById('importFile');
+            const importWarningModal = document.getElementById('importWarningModal');
+            const confirmImportBtn = document.getElementById('confirmImportBtn');
+            const cancelImportBtn = document.getElementById('cancelImportBtn');
 
-            // Translation content
+            let itemToDeleteIndex = -1;
+            let fileToImport = null;
+
             const translations = {
                 en: {
                     h1Title: 'CKD-EPI eGFR Calculator',
                     langEn: 'EN',
                     langRu: 'RU',
                     calculatorTab: 'Calculator',
-                    settingsTab: 'Settings',
                     historyTab: 'History',
+                    settingsTab: 'Settings',
                     dateLabel: 'Date of Calculation',
                     dobLabel: 'Date of Birth',
                     sexLabel: 'Sex',
@@ -324,17 +359,17 @@
                     creatinineLabel_umoll: 'Serum Creatinine (µmol/L)',
                     calculateBtn: 'Calculate eGFR',
                     egfrLabel: 'Estimated GFR',
-                    egfrUnits: 'mL/min/1.73 $m^2$',
+                    egfrUnits: 'mL/min/1.73 $м^2$',
                     chartTitle: 'eGFR History Chart',
                     chartXLabel: 'Date of Calculation',
-                    chartYLabel: 'eGFR (mL/min/1.73 $m^2$)',
+                    chartYLabel: 'eGFR (mL/min/1.73 $м^2$)',
                     tooltipEgfr: 'eGFR:',
                     tooltipDate: 'Date:',
                     tooltipAge: 'Age:',
                     tooltipCreatinine: 'Creatinine:',
                     historyTitle: 'Calculation History',
                     historyDateHeader: 'Date',
-                    historyEgfrHeader: 'eGFR (mL/min/1.73 $m^2$)',
+                    historyEgfrHeader: 'eGFR',
                     errorMsg: 'Please enter a valid date of birth, calculation date, and serum creatinine value.',
                     ageTooLowMsg: 'The calculator is for individuals aged 18 and older. Please enter a valid date of birth.',
                     historicalDataLabel: 'Historical Data',
@@ -350,15 +385,24 @@
                     confirmTitle: 'Confirm Deletion',
                     confirmMessage: 'Are you sure you want to delete this calculation from your history?',
                     confirmBtn: 'Confirm',
-                    cancelBtn: 'Cancel'
+                    cancelBtn: 'Cancel',
+                    exportBtn: 'Export Data',
+                    importBtn: 'Import Data',
+                    importWarningTitle: 'Warning',
+                    importWarningMessage: 'Are you sure you want to import data? This action will **completely clear** the current history and settings and replace them with the data from the file.',
+                    confirmImportBtn: 'Confirm',
+                    cancelImportBtn: 'Отмена',
+                    noHistoryData: 'No history data.',
+                    importSuccess: 'Data imported successfully.',
+                    importError: 'Error importing data: Invalid file format.',
                 },
                 ru: {
-                    h1Title: 'Калькулятор eGFR',
+                    h1Title: 'Калькулятор СКФ по формуле CKD-EPI',
                     langEn: 'АНГЛ',
                     langRu: 'РУС',
                     calculatorTab: 'Калькулятор',
-                    settingsTab: 'Настройки',
                     historyTab: 'История',
+                    settingsTab: 'Настройки',
                     dateLabel: 'Дата расчета',
                     dobLabel: 'Дата рождения',
                     sexLabel: 'Пол',
@@ -369,10 +413,10 @@
                     blackOption: 'Черная',
                     creatinineLabel_mgdl: 'Креатинин сыворотки (мг/дл)',
                     creatinineLabel_umoll: 'Креатинин сыворотки (мкмоль/л)',
-                    calculateBtn: 'Рассчитать eGFR',
+                    calculateBtn: 'Рассчитать СКФ',
                     egfrLabel: 'Расчетная СКФ',
                     egfrUnits: 'мл/мин/1.73 $м^2$',
-                    chartTitle: 'График истории eGFR',
+                    chartTitle: 'График истории СКФ',
                     chartXLabel: 'Дата расчета',
                     chartYLabel: 'СКФ (мл/мин/1.73 $м^2$)',
                     tooltipEgfr: 'СКФ:',
@@ -381,7 +425,7 @@
                     tooltipCreatinine: 'Креатинин:',
                     historyTitle: 'История расчетов',
                     historyDateHeader: 'Дата',
-                    historyEgfrHeader: 'СКФ (мл/мин/1.73 $м^2$)',
+                    historyEgfrHeader: 'СКФ',
                     errorMsg: 'Пожалуйста, введите действительную дату рождения, дату расчета и значение креатинина сыворотки.',
                     ageTooLowMsg: 'Калькулятор предназначен для лиц 18 лет и старше. Пожалуйста, введите правильную дату рождения.',
                     historicalDataLabel: 'Исторические данные',
@@ -397,24 +441,28 @@
                     confirmTitle: 'Подтвердите удаление',
                     confirmMessage: 'Вы уверены, что хотите удалить этот расчет из своей истории?',
                     confirmBtn: 'Подтвердить',
-                    cancelBtn: 'Отмена'
+                    cancelBtn: 'Отмена',
+                    exportBtn: 'Экспорт данных',
+                    importBtn: 'Импорт данных',
+                    importWarningTitle: 'Предупреждение',
+                    importWarningMessage: 'Вы уверены, что хотите импортировать данные? Это действие **полностью очистит** текущую историю и заменит их данными из файла.',
+                    confirmImportBtn: 'Подтвердить',
+                    cancelImportBtn: 'Отмена',
+                    noHistoryData: 'Нет данных в истории.',
+                    importSuccess: 'Данные успешно импортированы.',
+                    importError: 'Ошибка при импорте: Неверный формат файла.',
                 }
             };
 
-            // History data array
             let history = [];
 
-            // Set the default date to today
             const today = new Date();
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
             const day = String(today.getDate()).padStart(2, '0');
             calculationDateInput.value = `${year}-${month}-${day}`;
             
-            // Conversion factor
             const CONVERSION_FACTOR = 88.4;
-
-            // Unit state
             let currentUnit = 'µmol/L';
 
             function calculateAge(dob, calcDate) {
@@ -425,14 +473,13 @@
                 return ageInYears;
             }
             
-            // Formula for non-black male using a given creatinine
             function calculateEGFRFromCreatinine(creatinine_mgdl, age, sex, race) {
                 let k, alpha, raceFactor;
 
                 if (sex === 'female') {
                     k = 0.7;
                     alpha = creatinine_mgdl <= k ? -0.241 : -1.2;
-                } else { // male
+                } else {
                     k = 0.9;
                     alpha = creatinine_mgdl <= k ? -0.302 : -1.2;
                 }
@@ -441,170 +488,6 @@
 
                 return 142 * Math.pow(creatinine_mgdl / k, alpha) * Math.pow(0.9938, age) * raceFactor;
             }
-
-
-            const egfrChart = new Chart(document.getElementById('egfrChart'), {
-                type: 'line',
-                data: {
-                    datasets: []
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'year'
-                            },
-                            title: {
-                                display: true,
-                                text: translations.en.chartXLabel,
-                                font: { weight: 'bold' }
-                            },
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: translations.en.chartYLabel,
-                                font: { weight: 'bold' }
-                            },
-                            beginAtZero: true,
-                            max: 150
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const lang = langSwitch.checked ? 'ru' : 'en';
-                                    return `${translations[lang].tooltipEgfr} ${context.raw.y.toFixed(2)}`;
-                                },
-                                title: function(context) {
-                                    const lang = langSwitch.checked ? 'ru' : 'en';
-                                    const dataPoint = context[0].raw;
-                                    if (dataPoint.date) {
-                                        return `${translations[lang].tooltipDate} ${dataPoint.date}, ${translations[lang].tooltipAge} ${dataPoint.age}, ${translations[lang].tooltipCreatinine} ${dataPoint.creatinine} ${dataPoint.units}`;
-                                    } else {
-                                        return `${translations[lang].tooltipDate} ${dataPoint.x.toISOString().split('T')[0]}`;
-                                    }
-                                }
-                            }
-                        },
-                        annotation: {
-                            annotations: {
-                                ckd5: {
-                                    type: 'box',
-                                    yMin: 0,
-                                    yMax: 15,
-                                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                                    borderColor: 'rgba(239, 68, 68, 0.5)',
-                                    borderWidth: 1,
-                                    label: {
-                                        content: translations.en.ckdStage5,
-                                        enabled: true,
-                                        position: 'start',
-                                        backgroundColor: '#ef4444',
-                                        font: {
-                                            size: 10,
-                                            weight: 'bold'
-                                        }
-                                    }
-                                },
-                                ckd4: {
-                                    type: 'box',
-                                    yMin: 15,
-                                    yMax: 30,
-                                    backgroundColor: 'rgba(249, 115, 22, 0.2)',
-                                    borderColor: 'rgba(249, 115, 22, 0.5)',
-                                    borderWidth: 1,
-                                    label: {
-                                        content: translations.en.ckdStage4,
-                                        enabled: true,
-                                        position: 'start',
-                                        backgroundColor: '#f97316',
-                                        font: {
-                                            size: 10,
-                                            weight: 'bold'
-                                        }
-                                    }
-                                },
-                                ckd3b: {
-                                    type: 'box',
-                                    yMin: 30,
-                                    yMax: 45,
-                                    backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                                    borderColor: 'rgba(245, 158, 11, 0.5)',
-                                    borderWidth: 1,
-                                    label: {
-                                        content: translations.en.ckdStage3b,
-                                        enabled: true,
-                                        position: 'start',
-                                        backgroundColor: '#f59e0b',
-                                        font: {
-                                            size: 10,
-                                            weight: 'bold'
-                                        }
-                                    }
-                                },
-                                ckd3a: {
-                                    type: 'box',
-                                    yMin: 45,
-                                    yMax: 60,
-                                    backgroundColor: 'rgba(234, 179, 8, 0.2)',
-                                    borderColor: 'rgba(234, 179, 8, 0.5)',
-                                    borderWidth: 1,
-                                    label: {
-                                        content: translations.en.ckdStage3a,
-                                        enabled: true,
-                                        position: 'start',
-                                        backgroundColor: '#eab308',
-                                        font: {
-                                            size: 10,
-                                            weight: 'bold'
-                                        }
-                                    }
-                                },
-                                ckd2: {
-                                    type: 'box',
-                                    yMin: 60,
-                                    yMax: 90,
-                                    backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                                    borderColor: 'rgba(34, 197, 94, 0.5)',
-                                    borderWidth: 1,
-                                    label: {
-                                        content: translations.en.ckdStage2,
-                                        enabled: true,
-                                        position: 'start',
-                                        backgroundColor: '#22c55e',
-                                        font: {
-                                            size: 10,
-                                            weight: 'bold'
-                                        }
-                                    }
-                                },
-                                ckd1: {
-                                    type: 'box',
-                                    yMin: 90,
-                                    yMax: 150,
-                                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                                    borderColor: 'rgba(16, 185, 129, 0.5)',
-                                    borderWidth: 1,
-                                    label: {
-                                        content: translations.en.ckdStage1,
-                                        enabled: true,
-                                        position: 'start',
-                                        backgroundColor: '#10b981',
-                                        font: {
-                                            size: 10,
-                                            weight: 'bold'
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            });
 
             function updateMessageBox(message, type) {
                 messageBox.textContent = message;
@@ -618,9 +501,24 @@
                 }
                 messageBox.classList.remove('hidden');
             }
+            
+            function updateImportMessageBox(message, type) {
+                importMessageBox.textContent = message;
+                if (type === 'success') {
+                    importMessageBox.classList.remove('hidden', 'bg-red-100', 'text-red-700');
+                    importMessageBox.classList.add('bg-green-100', 'text-green-700');
+                } else if (type === 'error') {
+                     importMessageBox.classList.remove('hidden', 'bg-green-100', 'text-green-700');
+                     importMessageBox.classList.add('bg-red-100', 'text-red-700');
+                }
+            }
 
             function clearMessageBox() {
                 messageBox.classList.add('hidden');
+            }
+            
+            function clearImportMessageBox() {
+                importMessageBox.classList.add('hidden');
             }
 
             function updateLanguage(lang) {
@@ -632,47 +530,15 @@
                     }
                 });
                 
-                // Update disclaimer text
-                disclaimerText.textContent = translations[lang].disclaimerText;
-
-                // Update select options
-                document.querySelector('[data-lang-key="femaleOption"]').textContent = translations[lang].femaleOption;
-                document.querySelector('[data-lang-key="maleOption"]').textContent = translations[lang].maleOption;
-                document.querySelector('[data-lang-key="nonBlackOption"]').textContent = translations[lang].nonBlackOption;
-                document.querySelector('[data-lang-key="blackOption"]').textContent = translations[lang].blackOption;
-
-                // Update creatinine label based on current unit
-                creatinineLabel.textContent = translations[lang][`creatinineLabel_${currentUnit === 'mg/dL' ? 'mgdl' : 'umoll'}`];
-
-                // Update Chart titles and labels
-                egfrChart.options.scales.x.title.text = translations[lang].chartXLabel;
-                egfrChart.options.scales.y.title.text = translations[lang].chartYLabel;
-
-                // Fix: Check if datasets exist before trying to set their labels
-                if (egfrChart.data.datasets.length > 0) {
-                    egfrChart.data.datasets[0].label = translations[lang].historicalDataLabel;
+                if (disclaimerText) {
+                    disclaimerText.textContent = translations[lang].disclaimerText;
                 }
-                if (egfrChart.data.datasets.length > 1) {
-                    egfrChart.data.datasets[1].label = translations[lang].extrapolatedDataLabel;
-                }
-
-                // Update annotation labels
-                egfrChart.options.plugins.annotation.annotations.ckd1.label.content = translations[lang].ckdStage1;
-                egfrChart.options.plugins.annotation.annotations.ckd2.label.content = translations[lang].ckdStage2;
-                egfrChart.options.plugins.annotation.annotations.ckd3a.label.content = translations[lang].ckdStage3a;
-                egfrChart.options.plugins.annotation.annotations.ckd3b.label.content = translations[lang].ckdStage3b;
-                egfrChart.options.plugins.annotation.annotations.ckd4.label.content = translations[lang].ckdStage4;
-                egfrChart.options.plugins.annotation.annotations.ckd5.label.content = translations[lang].ckdStage5;
-
-                // Update modal texts
-                document.querySelector('[data-lang-key="confirmTitle"]').textContent = translations[lang].confirmTitle;
-                document.querySelector('[data-lang-key="confirmMessage"]').textContent = translations[lang].confirmMessage;
-                document.querySelector('[data-lang-key="confirmBtn"]').textContent = translations[lang].confirmBtn;
-                document.querySelector('[data-lang-key="cancelBtn"]').textContent = translations[lang].cancelBtn;
                 
-                egfrChart.update();
+                if (creatinineLabel) {
+                    creatinineLabel.textContent = translations[lang][`creatinineLabel_${currentUnit === 'mg/dL' ? 'mgdl' : 'umoll'}`];
+                }
 
-                // Re-render history table
+                updateChart();
                 updateHistoryTable();
             }
 
@@ -684,6 +550,8 @@
                 settingsTabBtn.classList.remove('border-blue-500', 'text-blue-600', 'border-b-2');
                 historyTabBtn.classList.remove('border-blue-500', 'text-blue-600', 'border-b-2');
                 
+                clearImportMessageBox();
+
                 if (tabId === 'calculator') {
                     calculatorContent.classList.remove('hidden');
                     calculatorTabBtn.classList.add('border-b-2', 'border-blue-500', 'text-blue-600');
@@ -697,19 +565,16 @@
                 }
             }
             
-            // Function to show the confirmation modal
             function showConfirmationModal(index) {
                 itemToDeleteIndex = index;
                 confirmationModal.classList.remove('hidden');
             }
 
-            // Function to hide the confirmation modal
             function hideConfirmationModal() {
                 itemToDeleteIndex = -1;
                 confirmationModal.classList.add('hidden');
             }
             
-            // Function to delete an entry from history and update UI
             function deleteHistoryEntry(index) {
                 history.splice(index, 1);
                 saveToLocalStorage();
@@ -728,9 +593,11 @@
 
             function updateHistoryTable() {
                 const lang = langSwitch.checked ? 'ru' : 'en';
-                historyTableBody.innerHTML = ''; // Clear table
-                if (history.length === 0) {
-                    historyTableBody.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500 py-4">No history data available.</td></tr>`;
+                historyTableBody.innerHTML = '';
+                if (!Array.isArray(history) || history.length === 0) {
+                    const noDataRow = document.createElement('tr');
+                    noDataRow.innerHTML = `<td colspan="4" class="text-center text-gray-500 py-4">${translations[lang].noHistoryData}</td>`;
+                    historyTableBody.appendChild(noDataRow);
                     return;
                 }
                 history.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -738,43 +605,43 @@
                     const row = document.createElement('tr');
                     const dateCell = document.createElement('td');
                     const egfrCell = document.createElement('td');
-                    const actionCell = document.createElement('td'); // New cell for the button
+                    const creatinineCell = document.createElement('td');
+                    const actionCell = document.createElement('td');
                     
                     dateCell.textContent = entry.date;
-                    egfrCell.textContent = entry.egfr.toFixed(2);
+                    egfrCell.textContent = entry.egfr ? entry.egfr.toFixed(2) : '-';
+                    creatinineCell.textContent = entry.creatinine ? `${entry.creatinine.toFixed(2)} ${entry.units}` : '-';
 
-                    // Create the delete button
                     const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'delete-btn text-red-500 hover:text-red-700';
-                    deleteBtn.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                            <path fill-rule="evenodd" d="M16.5 4.475a.75.75 0 01.723.364l2.51 4.54a.75.75 0 010 .622l-2.51 4.541a.75.75 0 01-.723.364h-1.077a.75.75 0 01-.699-.508l-1.39-4.22a.75.75 0 00-.733-.526H9.75a.75.75 0 00-.733.526l-1.39 4.22a.75.75 0 01-.699.508H5.25a.75.75 0 01-.723-.364l-2.51-4.541a.75.75 0 010-.622l2.51-4.54a.75.75 0 01.723-.364h1.077a.75.75 0 01.699.508L8.25 8.16a.75.75 0 00.733.526h4.5a.75.75 0 00.733-.526l1.39-4.22a.75.75 0 01.699-.508h1.077z" clip-rule="evenodd" />
-                            <path d="M19.5 18a.75.75 0 00-.75.75c0 1.94-1.637 3.5-3.67 3.5H9.92c-2.033 0-3.67-1.56-3.67-3.5a.75.75 0 00-1.5 0c0 2.84 2.37 5 5.17 5h4.999c2.8 0 5.17-2.16 5.17-5a.75.75 0 00-.75-.75z" />
-                        </svg>
-                    `;
-                    deleteBtn.title = 'Delete this entry';
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.textContent = '–';
+                    deleteBtn.title = 'Удалить эту запись';
                     deleteBtn.addEventListener('click', () => showConfirmationModal(index));
 
                     actionCell.appendChild(deleteBtn);
+                    actionCell.classList.add('text-center');
 
                     row.appendChild(dateCell);
                     row.appendChild(egfrCell);
+                    row.appendChild(creatinineCell);
                     row.appendChild(actionCell);
                     historyTableBody.appendChild(row);
                 });
             }
-
-            // Function to perform linear regression
+            
+            // Новая функция: Вычисление линейной регрессии
             function linearRegression(data) {
-                if (data.length < 2) return { slope: 0, intercept: data.length > 0 ? data[0].y : 0 };
+                if (data.length < 2) return { slope: 0, intercept: data.length > 0 ? data[0].y : 0, referenceDate: new Date() };
                 
                 const n = data.length;
                 let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
                 
+                // Используем первую дату как точку отсчета для "x=0"
                 const referenceDate = new Date(data[0].x);
 
                 for (let i = 0; i < n; i++) {
-                    const x = (new Date(data[i].x) - referenceDate) / (1000 * 60 * 60 * 24 * 365.25); // Convert to years
+                    // Переводим дату в количество лет с начала периода для оси X
+                    const x = (data[i].x - referenceDate) / (1000 * 60 * 60 * 24 * 365.25);
                     const y = data[i].y;
                     sumX += x;
                     sumY += y;
@@ -782,41 +649,110 @@
                     sumX2 += x * x;
                 }
                 
-                const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-                const intercept = (sumY - slope * sumX) / n;
+                const denominator = (n * sumX2 - sumX * sumX);
+                const slope = denominator === 0 ? 0 : (n * sumXY - sumX * sumY) / denominator;
+                const intercept = (sumY / n) - (slope * sumX / n);
                 
                 return { slope, intercept, referenceDate };
             }
 
-            function updateChart() {
-                // Sort history data by date
-                history.sort((a, b) => new Date(a.date) - new Date(b.date));
+            const egfrZonesPlugin = {
+                id: 'egfrZonesPlugin',
+                beforeDraw: (chart) => {
+                    const { ctx, chartArea: { left, right, top, bottom }, scales: { y } } = chart;
+                    
+                    if (y && y.axis === 'y') {
+                        const drawRect = (color, startValue, endValue) => {
+                            const yStart = y.getPixelForValue(endValue);
+                            const yEnd = y.getPixelForValue(startValue);
+                            ctx.fillStyle = color;
+                            ctx.fillRect(left, yStart, right - left, yEnd - yStart);
+                        };
+                        
+                        drawRect('rgba(16, 185, 129, 0.2)', 90, 150);
+                        drawRect('rgba(34, 197, 94, 0.2)', 60, 89);
+                        drawRect('rgba(234, 179, 8, 0.2)', 45, 59);
+                        drawRect('rgba(245, 158, 11, 0.2)', 30, 44);
+                        drawRect('rgba(249, 115, 22, 0.2)', 15, 29);
+                        drawRect('rgba(239, 68, 68, 0.2)', 0, 14);
+                    }
+                }
+            };
+            
+            const egfrLinesPlugin = {
+                id: 'egfrLinesPlugin',
+                afterDraw: (chart) => {
+                    const { ctx, chartArea: { left, right }, scales: { y } = {} } = chart;
+                    if (!y) return;
+                    const drawLine = (value, color) => {
+                        const yPixel = y.getPixelForValue(value);
+                        if (yPixel < y.bottom && yPixel > y.top) {
+                            ctx.save();
+                            ctx.strokeStyle = color;
+                            ctx.lineWidth = 2; // Увеличиваем толщину линии
+                            ctx.setLineDash([5, 5]);
+                            ctx.beginPath();
+                            ctx.moveTo(left, yPixel);
+                            ctx.lineTo(right, yPixel);
+                            ctx.stroke();
+                            ctx.restore();
+                        }
+                    };
+                    
+                    drawLine(30, 'orange');
+                    drawLine(15, 'red');
+                    drawLine(5, 'darkred');
+                }
+            };
 
-                const historicalData = history.map(entry => ({ x: new Date(entry.date), y: entry.egfr, date: entry.date, age: entry.age, creatinine: entry.creatinine, units: entry.units }));
+            function updateChart() {
+                const canvas = document.getElementById('egfrChart');
                 const lang = langSwitch.checked ? 'ru' : 'en';
 
-                egfrChart.data.datasets = [];
+                const historicalData = history.filter(entry => entry.egfr !== null && entry.egfr !== undefined).map(entry => ({ 
+                    x: new Date(entry.date), 
+                    y: entry.egfr,
+                    creatinine: entry.creatinine,
+                    units: entry.units,
+                    type: 'historical'
+                }));
 
-                // Add historical data dataset
-                egfrChart.data.datasets.push({
-                    label: translations[lang].historicalDataLabel,
-                    data: historicalData,
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.5)',
-                    pointRadius: 6,
-                    pointHoverRadius: 8,
-                    tension: 0.1,
-                    fill: false,
-                });
+                if (historicalData.length === 0) {
+                    chartSection.classList.add('hidden');
+                    if (canvas.chart) {
+                        canvas.chart.destroy();
+                    }
+                    return;
+                } else {
+                    chartSection.classList.remove('hidden');
+                }
 
-                // Extrapolation logic based on linear regression
+                if (canvas.chart) {
+                    canvas.chart.destroy();
+                }
+
+                historicalData.sort((a, b) => a.x - b.x);
+
+                const datasets = [
+                    {
+                        label: translations[lang].historicalDataLabel,
+                        data: historicalData,
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        tension: 0.1,
+                        fill: false,
+                        pointBackgroundColor: 'rgb(59, 130, 246)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(59, 130, 246)'
+                    }
+                ];
+
                 if (historicalData.length >= 2) {
                     const regression = linearRegression(historicalData);
+                    
                     const lastHistoricalPoint = historicalData[historicalData.length - 1];
-
-                    let extrapolatedData = [];
-                    // Start the extrapolated line from the last historical point
-                    extrapolatedData.push({ x: lastHistoricalPoint.x, y: lastHistoricalPoint.y });
+                    const extrapolatedData = [lastHistoricalPoint];
 
                     for (let i = 1; i <= 10; i++) {
                         const futureDate = new Date(lastHistoricalPoint.x);
@@ -825,32 +761,84 @@
                         let predictedEgfr = (regression.slope * yearsFromRef) + regression.intercept;
                         
                         if (predictedEgfr < 0) predictedEgfr = 0;
-                        extrapolatedData.push({ x: futureDate, y: predictedEgfr });
+                        extrapolatedData.push({ x: futureDate, y: predictedEgfr, type: 'extrapolated' });
                     }
-
-                    // Add extrapolated data dataset
-                    egfrChart.data.datasets.push({
+                    
+                    datasets.push({
                         label: translations[lang].extrapolatedDataLabel,
                         data: extrapolatedData,
-                        borderColor: 'rgb(59, 130, 246)',
+                        borderColor: 'rgb(249, 115, 22)',
                         borderDash: [5, 5],
-                        pointRadius: 0,
                         tension: 0.1,
                         fill: false,
+                        pointRadius: 0
                     });
                 }
                 
-                // Set the X-axis range dynamically
-                if (history.length > 0) {
-                    const earliestDate = new Date(history[0].date);
-                    const latestDate = new Date(history[history.length - 1].date);
-                    const futureDate = new Date(latestDate);
-                    futureDate.setFullYear(futureDate.getFullYear() + 10);
-                    egfrChart.options.scales.x.min = earliestDate.toISOString().split('T')[0];
-                    egfrChart.options.scales.x.max = futureDate.toISOString().split('T')[0];
-                }
+                const plugins = [egfrZonesPlugin, egfrLinesPlugin];
 
-                egfrChart.update();
+                canvas.chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'year',
+                                    tooltipFormat: 'yyyy-MM-dd'
+                                },
+                                title: {
+                                    display: true,
+                                    text: translations[lang].chartXLabel,
+                                    font: { weight: 'bold' }
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                max: 150,
+                                title: {
+                                    display: true,
+                                    text: translations[lang].egfrLabel,
+                                    font: { weight: 'bold' }
+                                },
+                                ticks: {
+                                    stepSize: 5
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: history.length > 0,
+                                labels: {
+                                    boxWidth: 20
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: (context) => {
+                                        return context[0].raw.type === 'historical' ? 
+                                               `${translations[lang].historicalDataLabel}` : 
+                                               `${translations[lang].extrapolatedDataLabel}`;
+                                    },
+                                    label: (context) => {
+                                        const egfrValue = context.raw.y.toFixed(2);
+                                        return `${translations[lang].tooltipEgfr} ${egfrValue}`;
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                    },
+                    plugins: plugins
+                });
             }
 
             function calculateEGFR() {
@@ -884,21 +872,19 @@
                 egfrValueSpan.textContent = egfr.toFixed(2);
                 resultsDiv.classList.remove('hidden');
 
-                // Add to history
                 history.push({ 
                     date: calculationDate, 
                     egfr: egfr,
                     age: age.toFixed(0),
                     creatinine: originalCreatinine,
-                    units: currentUnit
+                    units: currentUnit,
                 });
 
-                // Save data to local storage after a new calculation
                 saveToLocalStorage();
-
-                // Update chart and history table
                 updateChart();
                 updateHistoryTable();
+                updateMessageBox('Расчет успешно добавлен в историю.', 'success');
+                creatinineInput.value = '';
             }
 
             function handleUnitSwitch() {
@@ -921,7 +907,6 @@
                 }
             }
             
-            // Local Storage functions
             function saveToLocalStorage() {
                 const patientData = {
                     dob: dobInput.value,
@@ -935,23 +920,110 @@
             function loadFromLocalStorage() {
                 const storedData = localStorage.getItem('creatinineCalculatorData');
                 if (storedData) {
-                    const patientData = JSON.parse(storedData);
-                    dobInput.value = patientData.dob || '';
-                    sexSelect.value = patientData.sex || 'female';
-                    raceSelect.value = patientData.race || 'non-black';
-                    history = patientData.history || [];
+                    try {
+                        const patientData = JSON.parse(storedData);
+                        dobInput.value = patientData.dob || '';
+                        sexSelect.value = patientData.sex || 'female';
+                        raceSelect.value = patientData.race || 'non-black';
+                        if (Array.isArray(patientData.history)) {
+                             history = patientData.history;
+                        } else {
+                            history = [];
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse data from localStorage:', e);
+                        history = [];
+                    }
                     
                     updateHistoryTable();
                     updateChart();
                 }
             }
 
-            // Event listeners for patient settings to save changes
+            function exportData() {
+                const patientData = {
+                    dob: dobInput.value,
+                    sex: sexSelect.value,
+                    race: raceSelect.value,
+                    history: history.map(entry => ({
+                        date: entry.date,
+                        egfr: entry.egfr,
+                        creatinine: entry.creatinine,
+                        units: entry.units
+                    }))
+                };
+                const dataStr = JSON.stringify(patientData, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const filename = `GFR-${day}-${month}-${year}-${hours}${minutes}.json`;
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            function importData(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const lang = langSwitch.checked ? 'ru' : 'en';
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        const hasRequiredProps = importedData.dob !== undefined && importedData.sex !== undefined && importedData.race !== undefined && Array.isArray(importedData.history);
+                        if (hasRequiredProps) {
+                            dobInput.value = importedData.dob;
+                            sexSelect.value = importedData.sex;
+                            raceSelect.value = importedData.race;
+                            history = importedData.history;
+                            saveToLocalStorage();
+                            loadFromLocalStorage();
+                            updateImportMessageBox(translations[lang].importSuccess, 'success');
+                        } else {
+                            updateImportMessageBox(translations[lang].importError, 'error');
+                        }
+                    } catch (error) {
+                        updateImportMessageBox(translations[lang].importError, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            exportBtn.addEventListener('click', exportData);
+            importFile.addEventListener('change', (event) => {
+                fileToImport = event.target.files[0];
+                if (fileToImport) {
+                    importWarningModal.classList.remove('hidden');
+                }
+            });
+
+            confirmImportBtn.addEventListener('click', () => {
+                if (fileToImport) {
+                    importData(fileToImport);
+                    importWarningModal.classList.add('hidden');
+                    importFile.value = '';
+                    fileToImport = null;
+                }
+            });
+
+            cancelImportBtn.addEventListener('click', () => {
+                importWarningModal.classList.add('hidden');
+                importFile.value = '';
+                fileToImport = null;
+            });
+
             dobInput.addEventListener('change', saveToLocalStorage);
             sexSelect.addEventListener('change', saveToLocalStorage);
             raceSelect.addEventListener('change', saveToLocalStorage);
 
-            // Initial setup - default language is Russian, default unit is µmol/L
             updateLanguage('ru');
             handleUnitSwitch();
             showTab('calculator');
@@ -962,12 +1034,12 @@
             langSwitch.addEventListener('change', (e) => {
                 const lang = e.target.checked ? 'ru' : 'en';
                 updateLanguage(lang);
-                handleUnitSwitch(); // Re-apply unit label in the new language
+                handleUnitSwitch();
             });
 
             calculatorTabBtn.addEventListener('click', () => showTab('calculator'));
-            settingsTabBtn.addEventListener('click', () => showTab('settings'));
             historyTabBtn.addEventListener('click', () => showTab('history'));
+            settingsTabBtn.addEventListener('click', () => showTab('settings'));
         });
     </script>
 </body>
